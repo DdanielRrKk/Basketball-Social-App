@@ -1,50 +1,70 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import Animated from 'react-native-reanimated';
-import Svg, { Circle } from 'react-native-svg';
+import React from "react";
+import { View } from "react-native";
+import { Svg, Circle, Text as SVGText } from 'react-native-svg'
 
-const BACKGROUND_COLOR = '#444B6F';
-const BACKGROUND_STROKE_COLOR = '#303858';
-const STROKE_COLOR = '#A6E1FA';
+const DEFAULT_PROGRESS = 25;
+const DEFAULT_SIZE = 100;
+const DEFAULT_STROKEWIDTH = 10;
+const DEFAULT_TEXTSIZE = 16;
+const DEFAULT_BACKGROUND_COLOR = 'gray';
+const DEFAULT_COLOR = 'black';
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+export default function CircleChart({ 
+  ProgressPercentage, 
+  Size, 
+  StrokeWidth, 
+  Text, 
+  TextSize,
+  TextColor,
+  BackgroundColor,
+  StrokeColor }) {
 
-export default function CircleChart({ Progress = 0, Size = 0, Radius = 0, StrokeWidth = 0 }) {
-  const animatedProps = Animated.useAnimatedProps(() => ({
-    strokeDashoffset: CIRCLE_LENGTH * (1 - Progress)
-  }));
-  const CIRCLE_LENGTH = (2 * Math.PI) * Radius;
+  const progressPercent = ProgressPercentage ? ProgressPercentage : DEFAULT_PROGRESS;
+  const size = Size ? Size : DEFAULT_SIZE;
+  const strokeWidth = StrokeWidth ? StrokeWidth : DEFAULT_STROKEWIDTH;
+  const text = Text ? Text : '';
+  const textSize = TextSize ? TextSize : DEFAULT_TEXTSIZE;
+  const textColor = TextColor ? TextColor : DEFAULT_COLOR;
+  const backgroundColor = BackgroundColor ? BackgroundColor : DEFAULT_BACKGROUND_COLOR;
+  const strokeColor = StrokeColor ? StrokeColor : DEFAULT_COLOR;
+
+  const radius = (size - strokeWidth) / 2;
+  const circum = radius * 2 * Math.PI;
+  const svgProgress = 100 - progressPercent;
 
   return (
-    <View style={styles.container}>
-      <Svg style={{ position: 'absolute' }}>
-        <Circle
-          cx={Size / 2}
-          cy={Size / 2}
-          r={Radius}
-          stroke={BACKGROUND_STROKE_COLOR}
-          strokeWidth={30}
-        />
-        <AnimatedCircle
-          cx={Size / 2}
-          cy={Size / 2}
-          r={Radius}
-          stroke={STROKE_COLOR}
-          strokeWidth={15}
-          strokeDasharray={CIRCLE_LENGTH}
-          animatedProps={animatedProps}
-          strokeLinecap={'round'}
-        />
+    <View style={{margin: 10}}>
+      <Svg width={size} height={size}>
+        {/* Background Circle */}
+        <Circle 
+          stroke={backgroundColor}
+          fill="none"
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          {...{strokeWidth}} />
+        
+        {/* Progress Circle */}
+        <Circle 
+          stroke={strokeColor}
+          fill="none"
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          strokeDasharray={`${circum} ${circum}`}
+          strokeDashoffset={radius * Math.PI * 2 * (svgProgress/100)}
+          strokeLinecap="round"
+          transform={`rotate(-90, ${size/2}, ${size/2})`}
+          {...{strokeWidth}} />
+
+        {/* Text */}
+        <SVGText
+          fontSize={textSize}
+          x={size / 2}
+          y={size / 2 + (textSize / 2) - 1}
+          textAnchor="middle"
+          fill={textColor}>{text}</SVGText>
       </Svg>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: BACKGROUND_COLOR,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
