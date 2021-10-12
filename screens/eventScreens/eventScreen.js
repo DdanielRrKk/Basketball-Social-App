@@ -7,15 +7,21 @@ import CircleChart from '../../components/misc/circleChart';
 
 export default function EventScreen({ navigation }){
     return(
-        <View style={styles.search}>
+        <View style={styles.container}>
             <CircleChart 
-                Progress={25}
+                //ProgressPercentage={25}
                 Size={150}
-                Radius={100}/>
+                StrokeWidth={10} 
+                Text='test'
+                TextSize={16}/>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    
+    container:{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
